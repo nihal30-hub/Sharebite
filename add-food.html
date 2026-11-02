@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Food Listing – ShareBite</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="dashboard-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="logo">
+          <i class="fa-solid fa-seedling"></i>
+          Share<span>Bite</span>
+        </a>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar">D</div>
+        <div class="user-info">
+          <div class="user-name display-user-name">Loading...</div>
+          <span class="display-user-role user-role-badge role-badge-donor">Donor</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="donor-dashboard.html" class="sidebar-link">
+          <i class="fa-solid fa-gauge"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="add-food.html" class="sidebar-link active">
+          <i class="fa-solid fa-circle-plus"></i>
+          <span>Add Food</span>
+        </a>
+        <a href="requests.html" class="sidebar-link">
+          <i class="fa-solid fa-bell"></i>
+          <span>Food Requests</span>
+        </a>
+        <a href="impact.html" class="sidebar-link">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Platform Impact</span>
+        </a>
+        <a href="index.html" class="sidebar-link">
+          <i class="fa-solid fa-house"></i>
+          <span>Home Page</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="logoutBtn" class="btn-logout">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+      <header class="dashboard-topbar">
+        <div style="display:flex; align-items:center; gap:1rem;">
+          <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="topbar-title">
+            <h1>Create Surplus Food Listing</h1>
+            <p>Publish excess edible food so nearby receivers can claim it safely</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <a href="donor-dashboard.html" class="btn btn-outline btn-sm">
+            <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+          </a>
+        </div>
+      </header>
+
+      <div class="dashboard-content">
+        <div class="card-box" style="max-width: 800px; margin: 0 auto;">
+          <div class="card-box-header" style="border-bottom: 1px solid var(--cream-border); padding-bottom: 1.25rem;">
+            <div>
+              <h2 class="card-box-title"><i class="fa-solid fa-bowl-rice" style="color:var(--primary-forest);"></i> Donation Details</h2>
+              <p class="card-box-subtitle">Provide accurate details to ensure food hygiene and swift pickup</p>
+            </div>
+          </div>
+
+          <div id="addFoodAlert" class="alert alert-danger" style="display:none; margin-top:1.25rem;"></div>
+
+          <form id="addFoodForm" style="margin-top:1.5rem;" novalidate>
+            <!-- Food Name -->
+            <div class="form-group">
+              <label for="foodName" class="form-label">Food Item Title <span class="required">*</span></label>
+              <input 
+                type="text" 
+                id="foodName" 
+                class="form-control" 
+                placeholder="e.g. 50 Packets Vegetable Biryani & Raita" 
+                required
+              >
+              <div class="form-text">Give a clear descriptive title of the food items.</div>
+            </div>
+
+            <!-- Category & Unit -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.25rem;">
+              <div class="form-group">
+                <label for="foodCategory" class="form-label">Category <span class="required">*</span></label>
+                <select id="foodCategory" class="form-control" required>
+                  <option value="Cooked Meals">Cooked Meals (Rice, Curries, Rotis)</option>
+                  <option value="Bakery & Breads">Bakery & Breads (Sandwiches, Pastries, Buns)</option>
+                  <option value="Fresh Produce">Fresh Produce (Fruits, Raw Vegetables)</option>
+                  <option value="Packaged Food">Packaged & Canned Goods</option>
+                  <option value="Beverages">Beverages & Juice</option>
+                  <option value="Dairy">Dairy & Sweets</option>
+                  <option value="Others">Others</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="foodUnit" class="form-label">Unit of Measure <span class="required">*</span></label>
+                <select id="foodUnit" class="form-control" required>
+                  <option value="servings">servings / portions</option>
+                  <option value="packets">packets / meal boxes</option>
+                  <option value="kg">kg (Kilograms)</option>
+                  <option value="boxes">boxes / crates</option>
+                  <option value="litres">litres</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Quantity & Preparation Time -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.25rem;">
+              <div class="form-group">
+                <label for="foodQuantity" class="form-label">Total Quantity Available <span class="required">*</span></label>
+                <input 
+                  type="number" 
+                  id="foodQuantity" 
+                  class="form-control" 
+                  placeholder="e.g. 50" 
+                  min="1" 
+                  required
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="prepDateTime" class="form-label">Preparation Date & Time <span class="required">*</span></label>
+                <input 
+                  type="datetime-local" 
+                  id="prepDateTime" 
+                  class="form-control" 
+                  required
+                >
+              </div>
+            </div>
+
+            <!-- Safe Pickup Deadline & Location -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.25rem;">
+              <div class="form-group">
+                <label for="safeDeadline" class="form-label">Safe Pickup Deadline <span class="required">*</span></label>
+                <input 
+                  type="datetime-local" 
+                  id="safeDeadline" 
+                  class="form-control" 
+                  required
+                >
+                <div class="form-text">Must be a future time before which food must be collected.</div>
+              </div>
+
+              <div class="form-group">
+                <label for="pickupLocation" class="form-label">Pickup Location / Landmark <span class="required">*</span></label>
+                <input 
+                  type="text" 
+                  id="pickupLocation" 
+                  class="form-control" 
+                  placeholder="e.g. College Canteen Gate 2 / Near Main Auditorium" 
+                  required
+                >
+              </div>
+            </div>
+
+            <!-- Description & Dietary Notes -->
+            <div class="form-group">
+              <label for="foodDescription" class="form-label">Description & Handling Details <span class="required">*</span></label>
+              <textarea 
+                id="foodDescription" 
+                class="form-control" 
+                rows="4" 
+                placeholder="Mention dietary details (Vegetarian, Contains Nuts, etc.), packaging state (Packed in foil, Bring containers), and pickup instructions." 
+                required
+              ></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div style="display:flex; justify-content:flex-end; gap:1rem; margin-top:2rem;">
+              <a href="donor-dashboard.html" class="btn btn-secondary">Cancel</a>
+              <button type="submit" id="submitFoodBtn" class="btn btn-primary btn-lg">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Publish Food Listing
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { requireAuth, logoutUser, showToast } from "./js/auth.js";
+    import { addFoodListing } from "./js/food.js";
+
+    // Enforce role permission: Donor only
+    const { user, userData } = await requireAuth(["donor"]);
+
+    // Set default preparation time to now and deadline to +4 hours
+    const now = new Date();
+    const prepInput = document.getElementById("prepDateTime");
+    const deadlineInput = document.getElementById("safeDeadline");
+
+    // Format local datetime string
+    const formatLocalDateTime = (date) => {
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    };
+
+    prepInput.value = formatLocalDateTime(now);
+
+    const deadline = new Date(now.getTime() + 4 * 60 * 60 * 1000);
+    deadlineInput.value = formatLocalDateTime(deadline);
+
+    // Form submission
+    const form = document.getElementById("addFoodForm");
+    const submitBtn = document.getElementById("submitFoodBtn");
+    const alertBox = document.getElementById("addFoodAlert");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      alertBox.style.display = "none";
+
+      const foodName = document.getElementById("foodName").value.trim();
+      const category = document.getElementById("foodCategory").value;
+      const unit = document.getElementById("foodUnit").value;
+      const quantity = Number(document.getElementById("foodQuantity").value);
+      const preparationDate = prepInput.value;
+      const safePickupDeadline = deadlineInput.value;
+      const pickupLocation = document.getElementById("pickupLocation").value.trim();
+      const description = document.getElementById("foodDescription").value.trim();
+
+      // Form validation
+      if (!foodName) {
+        showValidation("Please specify a food item title.");
+        return;
+      }
+      if (isNaN(quantity) || quantity <= 0) {
+        showValidation("Quantity must be a positive number.");
+        return;
+      }
+      if (!pickupLocation) {
+        showValidation("Please provide a pickup location.");
+        return;
+      }
+      if (!description) {
+        showValidation("Please provide food details and handling guidelines.");
+        return;
+      }
+
+      // Check deadline is in future
+      const deadlineDate = new Date(safePickupDeadline);
+      if (deadlineDate <= new Date()) {
+        showValidation("Safe pickup deadline must be set in the future.");
+        return;
+      }
+
+      const origText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span class="spinner"></span> Publishing Listing...`;
+
+      const result = await addFoodListing({
+        foodName,
+        category,
+        unit,
+        quantity,
+        preparationDate,
+        safePickupDeadline,
+        pickupLocation,
+        description
+      });
+
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = origText;
+
+      if (result.success) {
+        setTimeout(() => {
+          window.location.href = "donor-dashboard.html";
+        }, 1200);
+      } else {
+        alertBox.textContent = result.error;
+        alertBox.style.display = "flex";
+      }
+    });
+
+    function showValidation(msg) {
+      alertBox.textContent = msg;
+      alertBox.style.display = "flex";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Logout listener
+    document.getElementById("logoutBtn")?.addEventListener("click", logoutUser);
+
+    // Mobile sidebar toggle
+    const menuBtn = document.getElementById("mobileMenuBtn");
+    const sidebar = document.getElementById("sidebar");
+    menuBtn?.addEventListener("click", () => {
+      sidebar?.classList.toggle("open");
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donor Dashboard – ShareBite</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="dashboard-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="logo">
+          <i class="fa-solid fa-seedling"></i>
+          Share<span>Bite</span>
+        </a>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar">D</div>
+        <div class="user-info">
+          <div class="user-name display-user-name">Loading...</div>
+          <span class="display-user-role user-role-badge role-badge-donor">Donor</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="donor-dashboard.html" class="sidebar-link active">
+          <i class="fa-solid fa-gauge"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="add-food.html" class="sidebar-link">
+          <i class="fa-solid fa-circle-plus"></i>
+          <span>Add Food</span>
+        </a>
+        <a href="requests.html" class="sidebar-link">
+          <i class="fa-solid fa-bell"></i>
+          <span>Food Requests</span>
+          <span class="badge-count" id="sidebar-pending-badge" style="display:none;">0</span>
+        </a>
+        <a href="impact.html" class="sidebar-link">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Platform Impact</span>
+        </a>
+        <a href="index.html" class="sidebar-link">
+          <i class="fa-solid fa-house"></i>
+          <span>Home Page</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="logoutBtn" class="btn-logout">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+      <!-- Topbar Header -->
+      <header class="dashboard-topbar">
+        <div style="display:flex; align-items:center; gap:1rem;">
+          <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="topbar-title">
+            <h1>Donor Control Panel</h1>
+            <p>Manage your surplus food donations and incoming requests</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <a href="add-food.html" class="btn btn-primary btn-sm">
+            <i class="fa-solid fa-plus"></i> Add Food Listing
+          </a>
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <div class="dashboard-content">
+        <!-- KPI Metrics Grid -->
+        <div class="stats-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon green">
+              <i class="fa-solid fa-utensils"></i>
+            </div>
+            <div class="kpi-info">
+              <h3 id="donor-kpi-total">0</h3>
+              <p>Total Listings</p>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon blue">
+              <i class="fa-solid fa-box-open"></i>
+            </div>
+            <div class="kpi-info">
+              <h3 id="donor-kpi-available">0</h3>
+              <p>Active Listings</p>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon amber">
+              <i class="fa-solid fa-clock"></i>
+            </div>
+            <div class="kpi-info">
+              <h3 id="donor-kpi-pending">0</h3>
+              <p>Pending Requests</p>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon purple">
+              <i class="fa-solid fa-handshake"></i>
+            </div>
+            <div class="kpi-info">
+              <h3 id="donor-kpi-completed">0</h3>
+              <p>Completed Collections</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending Requests Quick Action Box -->
+        <div class="card-box">
+          <div class="card-box-header">
+            <div>
+              <h2 class="card-box-title">Incoming Pending Requests</h2>
+              <p class="card-box-subtitle">Respond promptly so receivers can prepare for pickup</p>
+            </div>
+            <a href="requests.html" class="btn btn-outline btn-sm">
+              View All Requests <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Food Item & Receiver</th>
+                  <th>Requested Qty</th>
+                  <th>Requested At</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="donor-recent-requests-body">
+                <tr>
+                  <td colspan="5" class="empty-state" style="padding: 1.5rem;">
+                    <span class="spinner spinner-dark"></span> Loading requests...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Food Listings Management Box -->
+        <div class="card-box">
+          <div class="card-box-header">
+            <div>
+              <h2 class="card-box-title">My Surplus Food Listings</h2>
+              <p class="card-box-subtitle">Update available quantities, pickup deadlines, or remove entries</p>
+            </div>
+            <div class="nav-tabs" style="margin-bottom:0; border-bottom:none;">
+              <button class="tab-btn donor-filter-tab active" data-filter="all">All</button>
+              <button class="tab-btn donor-filter-tab" data-filter="available">Available</button>
+              <button class="tab-btn donor-filter-tab" data-filter="completed">Completed</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Food Name & Category</th>
+                  <th>Available Quantity</th>
+                  <th>Pickup Location</th>
+                  <th>Safe Deadline</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="donor-listings-table-body">
+                <tr>
+                  <td colspan="6" class="empty-state" style="padding: 2rem;">
+                    <span class="spinner spinner-dark"></span> Loading your listings...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Edit Food Listing Modal -->
+  <div class="modal-backdrop" id="editListingModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-pen-to-square" style="color:var(--primary-forest);"></i> Edit Food Listing</h3>
+        <button class="modal-close-btn" id="closeEditModalBtn">&times;</button>
+      </div>
+
+      <form id="editListingForm">
+        <div class="modal-body">
+          <input type="hidden" id="edit-food-id">
+          <input type="hidden" id="edit-food-prep-date">
+
+          <div class="form-group">
+            <label for="edit-food-name" class="form-label">Food Item Name <span class="required">*</span></label>
+            <input type="text" id="edit-food-name" class="form-control" required>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+            <div class="form-group">
+              <label for="edit-food-category" class="form-label">Category <span class="required">*</span></label>
+              <select id="edit-food-category" class="form-control" required>
+                <option value="Cooked Meals">Cooked Meals</option>
+                <option value="Bakery & Breads">Bakery & Breads</option>
+                <option value="Fresh Produce">Fresh Produce</option>
+                <option value="Packaged Food">Packaged Food</option>
+                <option value="Beverages">Beverages</option>
+                <option value="Dairy">Dairy</option>
+                <option value="Others">Others</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-food-unit" class="form-label">Unit <span class="required">*</span></label>
+              <select id="edit-food-unit" class="form-control" required>
+                <option value="servings">servings</option>
+                <option value="packets">packets</option>
+                <option value="kg">kg</option>
+                <option value="boxes">boxes</option>
+                <option value="litres">litres</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+            <div class="form-group">
+              <label for="edit-food-quantity" class="form-label">Available Quantity <span class="required">*</span></label>
+              <input type="number" id="edit-food-quantity" class="form-control" min="0" required>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-food-deadline" class="form-label">Pickup Deadline <span class="required">*</span></label>
+              <input type="datetime-local" id="edit-food-deadline" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-food-location" class="form-label">Pickup Location <span class="required">*</span></label>
+            <input type="text" id="edit-food-location" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-food-description" class="form-label">Description & Handling Details</label>
+            <textarea id="edit-food-description" class="form-control" rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" id="cancelEditBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">
+            <i class="fa-solid fa-floppy-disk"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { requireAuth, logoutUser } from "./js/auth.js";
+    import { initDonorDashboard } from "./js/dashboard.js";
+
+    // Enforce role permission: Donor only
+    const { user, userData } = await requireAuth(["donor"]);
+
+    // Initialize donor dashboard
+    initDonorDashboard(user);
+
+    // Logout listener
+    document.getElementById("logoutBtn")?.addEventListener("click", logoutUser);
+
+    // Mobile sidebar toggle
+    const menuBtn = document.getElementById("mobileMenuBtn");
+    const sidebar = document.getElementById("sidebar");
+    menuBtn?.addEventListener("click", () => {
+      sidebar?.classList.toggle("open");
+    });
+  </script>
+</body>
+</html>

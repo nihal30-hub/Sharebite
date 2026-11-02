@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Receiver Dashboard – ShareBite</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="dashboard-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="logo">
+          <i class="fa-solid fa-seedling"></i>
+          Share<span>Bite</span>
+        </a>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar">R</div>
+        <div class="user-info">
+          <div class="user-name display-user-name">Loading...</div>
+          <span class="display-user-role user-role-badge role-badge-receiver">Receiver</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="receiver-dashboard.html" class="sidebar-link active">
+          <i class="fa-solid fa-bowl-food"></i>
+          <span>Browse Food</span>
+        </a>
+        <a href="requests.html" class="sidebar-link">
+          <i class="fa-solid fa-clipboard-list"></i>
+          <span>My Requests</span>
+        </a>
+        <a href="impact.html" class="sidebar-link">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Platform Impact</span>
+        </a>
+        <a href="index.html" class="sidebar-link">
+          <i class="fa-solid fa-house"></i>
+          <span>Home Page</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="logoutBtn" class="btn-logout">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+      <!-- Topbar Header -->
+      <header class="dashboard-topbar">
+        <div style="display:flex; align-items:center; gap:1rem;">
+          <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="topbar-title">
+            <h1>Browse Available Surplus Food</h1>
+            <p>Request meals and groceries from community donors nearby</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <a href="requests.html" class="btn btn-outline btn-sm">
+            <i class="fa-solid fa-clock-rotate-left"></i> My Request History
+          </a>
+        </div>
+      </header>
+
+      <!-- Dashboard Content -->
+      <div class="dashboard-content">
+        <!-- KPI Metrics Grid -->
+        <div class="stats-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon green">
+              <i class="fa-solid fa-utensils"></i>
+            </div>
+            <div class="kpi-info">
+              <h3 id="receiver-kpi-available">0</h3>
+              <p>Available Listings</p>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon blue">
+              <i class="fa-solid fa-paper-plane"></i>
+            </div>
+            <div class="kpi-info">
+              <h3 id="receiver-kpi-total-req">0</h3>
+              <p>Requests Placed</p>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon amber">
+              <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+            <div class="kpi-info">
+              <h3 id="receiver-kpi-active">0</h3>
+              <p>Active Requests</p>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon purple">
+              <i class="fa-solid fa-check-double"></i>
+            </div>
+            <div class="kpi-info">
+              <h3 id="receiver-kpi-collected">0</h3>
+              <p>Collected Meals</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search & Filter Controls -->
+        <div class="card-box" style="padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;">
+          <div class="filter-bar" style="margin-bottom:0;">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input 
+                type="text" 
+                id="receiver-search-input" 
+                placeholder="Search by food name, pickup location, or donor..."
+              >
+            </div>
+
+            <div>
+              <select id="receiver-category-filter" class="filter-select">
+                <option value="all">All Categories</option>
+                <option value="Cooked Meals">Cooked Meals</option>
+                <option value="Bakery & Breads">Bakery & Breads</option>
+                <option value="Fresh Produce">Fresh Produce</option>
+                <option value="Packaged Food">Packaged Food</option>
+                <option value="Beverages">Beverages</option>
+                <option value="Dairy">Dairy</option>
+                <option value="Others">Others</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Food Listings Grid -->
+        <div class="food-grid" id="receiver-food-grid">
+          <div class="empty-state" style="grid-column: 1 / -1; padding: 3rem;">
+            <span class="spinner spinner-dark"></span> Loading available food donations...
+          </div>
+        </div>
+
+        <!-- Recent Requests Section -->
+        <div class="card-box" style="margin-top: 2.5rem;">
+          <div class="card-box-header">
+            <div>
+              <h2 class="card-box-title">My Recent Requests</h2>
+              <p class="card-box-subtitle">Track pickup approvals and collect food before the deadline</p>
+            </div>
+            <a href="requests.html" class="btn btn-outline btn-sm">
+              View All <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Food Item & Location</th>
+                  <th>Requested Quantity</th>
+                  <th>Date Requested</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="receiver-recent-requests-body">
+                <tr>
+                  <td colspan="5" class="empty-state" style="padding: 1.5rem;">
+                    <span class="spinner spinner-dark"></span> Loading requests...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Request Food Modal Dialog -->
+  <div class="modal-backdrop" id="requestFoodModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-hand-holding-heart" style="color:var(--primary-forest);"></i> Request Surplus Food</h3>
+        <button class="modal-close-btn" id="closeRequestModalBtn">&times;</button>
+      </div>
+
+      <form id="requestFoodForm">
+        <div class="modal-body">
+          <input type="hidden" id="modal-food-id">
+
+          <!-- Food Summary Card -->
+          <div style="background:var(--cream-bg); border:1px solid var(--cream-border); border-radius:var(--radius-md); padding:1rem; margin-bottom:1.25rem;">
+            <div style="font-size:1.15rem; font-weight:700; color:var(--primary-deep);" id="modal-food-title">Loading...</div>
+            <div style="font-size:0.85rem; color:var(--text-muted); margin-top:0.2rem;">
+              Shared by: <strong id="modal-food-donor">Donor</strong>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; margin-top:0.75rem; font-size:0.85rem;">
+              <div>
+                <span style="color:var(--text-muted);">Available:</span>
+                <strong id="modal-food-available-qty" style="color:var(--primary-green);">0</strong>
+              </div>
+              <div>
+                <span style="color:var(--text-muted);">Location:</span>
+                <strong id="modal-food-location">-</strong>
+              </div>
+              <div style="grid-column: 1 / -1;">
+                <span style="color:var(--text-muted);">Pickup Deadline:</span>
+                <strong id="modal-food-deadline" style="color:#b45309;">-</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quantity to request -->
+          <div class="form-group">
+            <label for="modal-request-qty" class="form-label">
+              Quantity to Request (<span id="modal-request-unit-label">servings</span>) <span class="required">*</span>
+            </label>
+            <input 
+              type="number" 
+              id="modal-request-qty" 
+              class="form-control" 
+              min="1" 
+              value="1" 
+              required
+            >
+            <div class="form-text">Request only what you or your community will immediately consume.</div>
+          </div>
+
+          <!-- Note to donor -->
+          <div class="form-group">
+            <label for="modal-request-note" class="form-label">Pickup Note / Message to Donor (Optional)</label>
+            <textarea 
+              id="modal-request-note" 
+              class="form-control" 
+              rows="3" 
+              placeholder="e.g. Can pick up in 30 minutes, bringing clean containers."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" id="cancelRequestModalBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">
+            <i class="fa-solid fa-paper-plane"></i> Submit Request
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { requireAuth, logoutUser } from "./js/auth.js";
+    import { initReceiverDashboard } from "./js/dashboard.js";
+
+    // Enforce role permission: Receiver only
+    const { user, userData } = await requireAuth(["receiver"]);
+
+    // Initialize receiver dashboard
+    initReceiverDashboard(user);
+
+    // Logout listener
+    document.getElementById("logoutBtn")?.addEventListener("click", logoutUser);
+
+    // Mobile sidebar toggle
+    const menuBtn = document.getElementById("mobileMenuBtn");
+    const sidebar = document.getElementById("sidebar");
+    menuBtn?.addEventListener("click", () => {
+      sidebar?.classList.toggle("open");
+    });
+  </script>
+</body>
+</html>

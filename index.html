@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShareBite – Food Sharing and Redistribution Platform</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <i class="fa-solid fa-seedling"></i>
+        Share<span>Bite</span>
+      </a>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="index.html" class="nav-link active">Home</a></li>
+        <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+        <li><a href="#features" class="nav-link">Features</a></li>
+        <li><a href="impact.html" class="nav-link">Live Impact</a></li>
+        <li><a href="receiver-dashboard.html" class="nav-link">Browse Food</a></li>
+      </ul>
+
+      <div class="nav-actions" id="navbar-auth-container">
+        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+        <a href="register.html" class="btn btn-primary btn-sm">Get Started</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero-section">
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <i class="fa-solid fa-heart-circle-check"></i>
+          Community Food Rescue
+        </div>
+        <h1 class="hero-title">Share Food, <span>Spread Happiness</span></h1>
+        <p class="hero-description">
+          ShareBite bridges the gap between surplus food donors—restaurants, caterers, event hosts, and caring
+          households—and people who need fresh meals. Together, we eliminate food waste and fight hunger.
+        </p>
+
+        <div class="hero-cta">
+          <a href="register.html?role=donor" class="btn btn-primary btn-lg">
+            <i class="fa-solid fa-hand-holding-heart"></i> Donate Food
+          </a>
+          <a href="receiver-dashboard.html" class="btn btn-secondary btn-lg">
+            <i class="fa-solid fa-utensils"></i> Find Food
+          </a>
+        </div>
+
+        <div class="hero-stats-mini">
+          <div class="mini-stat">
+            <h4 id="home-kpi-listings">--</h4>
+            <p>Meals Listed</p>
+          </div>
+          <div class="mini-stat">
+            <h4 id="home-kpi-completed">--</h4>
+            <p>Collected Donations</p>
+          </div>
+          <div class="mini-stat">
+            <h4 id="home-kpi-users">--</h4>
+            <p>Active Members</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Visual Card -->
+      <div class="hero-visual">
+        <div class="hero-float-badge badge-top">
+          <i class="fa-solid fa-circle-check" style="color: #10b981; font-size: 1.4rem;"></i>
+          <div>
+            <strong style="display:block; font-size:0.85rem;">100% Verified Pickup</strong>
+            <small style="color:var(--text-muted); font-size:0.75rem;">Direct Donor to Receiver</small>
+          </div>
+        </div>
+
+        <div class="hero-card-main">
+          <div class="hero-card-header">
+            <div class="hero-icon-box">
+              <i class="fa-solid fa-bowl-rice"></i>
+            </div>
+            <div>
+              <h4 style="font-size:1.15rem;">Live Surplus Stream</h4>
+              <p style="font-size:0.85rem; color:var(--text-muted);">Real-time available donations</p>
+            </div>
+          </div>
+
+          <div class="hero-preview-item">
+            <div>
+              <strong style="font-size:0.92rem; display:block;">Fresh Veg Pulav & Curry</strong>
+              <small style="color:var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Central Dining
+                Hall</small>
+            </div>
+            <span class="hero-tag">40 Servings</span>
+          </div>
+
+          <div class="hero-preview-item">
+            <div>
+              <strong style="font-size:0.92rem; display:block;">Artisan Bakery Breads</strong>
+              <small style="color:var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Metro Plaza
+                Corner</small>
+            </div>
+            <span class="hero-tag">15 Packets</span>
+          </div>
+
+          <div class="hero-preview-item">
+            <div>
+              <strong style="font-size:0.92rem; display:block;">Fresh Bananas & Apples</strong>
+              <small style="color:var(--text-muted);"><i class="fa-solid fa-location-dot"></i> Green Grocers
+                Market</small>
+            </div>
+            <span class="hero-tag">25 kg</span>
+          </div>
+
+          <div style="margin-top:1.2rem; text-align:center;">
+            <a href="receiver-dashboard.html" class="btn btn-outline btn-block btn-sm">
+              View All Available Food <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-float-badge badge-bottom">
+          <i class="fa-solid fa-shield-halved" style="color: #2d6a4f; font-size: 1.4rem;"></i>
+          <div>
+            <strong style="display:block; font-size:0.85rem;">Safe Food Guidelines</strong>
+            <small style="color:var(--text-muted); font-size:0.75rem;">Preparation & Deadline Tracked</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- How It Works Section -->
+  <section class="section section-alt" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Simple & Transparent</span>
+        <h2 class="section-title">How ShareBite Works</h2>
+        <p class="section-subtitle">A seamless three-step platform ensuring good food never goes to waste.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <span class="step-number">01</span>
+          <div class="step-icon-wrap">
+            <i class="fa-solid fa-plus-circle"></i>
+          </div>
+          <h3>Donors Post Surplus</h3>
+          <p>Donors quickly list edible excess food specifying item details, quantity, pickup location, preparation
+            time, and safe pickup deadline.</p>
+        </div>
+
+        <div class="step-card">
+          <span class="step-number">02</span>
+          <div class="step-icon-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+          <h3>Receivers Browse & Request</h3>
+          <p>Individuals, shelters, and food volunteers filter available listings in their locality and request the
+            precise quantity needed.</p>
+        </div>
+
+        <div class="step-card">
+          <span class="step-number">03</span>
+          <div class="step-icon-wrap">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+          <h3>Accept & Collect</h3>
+          <p>Donors accept requests, quantities are updated automatically, and receivers collect fresh food before the
+            safe pickup deadline.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Key Features</span>
+        <h2 class="section-title">Built for Efficiency and Safety</h2>
+        <p class="section-subtitle">Engineered with modern cloud architecture to deliver rapid, secure, and reliable
+          food redistribution.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-box">
+          <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
+          <h4>Real-Time Inventory</h4>
+          <p>Available quantities update atomically in Firestore when requests are accepted, preventing duplicate claims
+            or over-allocation.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+          <h4>Safe Pickup Deadlines</h4>
+          <p>Every listing requires a safe consumption deadline to ensure recipients receive fresh, hygienic, and
+            wholesome food.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-icon"><i class="fa-solid fa-user-shield"></i></div>
+          <h4>Role-Based Access</h4>
+          <p>Strict Firebase Security Rules isolate donor listing management from receiver requesting permissions.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-icon"><i class="fa-solid fa-chart-pie"></i></div>
+          <h4>Live Impact Analytics</h4>
+          <p>Track real-time community impact: meals rescued, verified handoffs completed, and total kilograms of food
+            saved.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-icon"><i class="fa-solid fa-filter"></i></div>
+          <h4>Instant Smart Filters</h4>
+          <p>Filter surplus meals by category—Cooked, Bakery, Produce, Dairy, Packaged—and instant keyword search.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+          <h4>Mobile Responsive</h4>
+          <p>Optimized for on-the-go smartphones, tablets, and laptops so donors and receivers can connect anywhere.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Real Impact Preview Banner -->
+  <section class="container">
+    <div class="impact-banner">
+      <h2>Real Food, Real Impact</h2>
+      <p>Every single portion registered on ShareBite represents carbon emissions prevented and a hungry person
+        nourished. All statistics reflect live Firestore database records.</p>
+
+      <div class="impact-stats-grid">
+        <div class="stat-pill">
+          <div class="number" id="home-kpi-quantity">--</div>
+          <div class="label">Units of Food Rescued</div>
+        </div>
+        <div class="stat-pill">
+          <div class="number" id="home-kpi-listings-2">--</div>
+          <div class="label">Total Food Listings</div>
+        </div>
+        <div class="stat-pill">
+          <div class="number" id="home-kpi-completed-2">--</div>
+          <div class="label">Successful Collections</div>
+        </div>
+        <div class="stat-pill">
+          <div class="number" id="home-kpi-users-2">--</div>
+          <div class="label">Registered Members</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 2rem; text-align: center;">
+        <a href="impact.html" class="btn btn-secondary btn-sm">
+          <i class="fa-solid fa-chart-line"></i> View Detailed Impact Dashboard
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="section">
+    <div class="container">
+      <div class="cta-box">
+        <h2>Ready to Make a Difference in Your College & Community?</h2>
+        <p>Join ShareBite now as a Food Donor or Receiver. It takes under 30 seconds to sign up.</p>
+        <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+          <a href="register.html?role=donor" class="btn btn-primary btn-lg">
+            <i class="fa-solid fa-bowl-food"></i> Join as Donor
+          </a>
+          <a href="register.html?role=receiver" class="btn btn-secondary btn-lg">
+            <i class="fa-solid fa-hand-holding-heart"></i> Join as Receiver
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <i class="fa-solid fa-seedling"></i>
+            Share<span>Bite</span>
+          </a>
+          <p>
+            ShareBite is a sustainable food redistribution initiative connecting generous donors with people in need to
+            build zero-waste, hunger-free communities.
+          </p>
+        </div>
+
+        <div class="footer-column">
+          <h4>Platform</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="receiver-dashboard.html">Browse Food</a></li>
+            <li><a href="add-food.html">Donate Food</a></li>
+            <li><a href="impact.html">Impact Dashboard</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-column">
+          <h4>User Accounts</h4>
+          <ul class="footer-links">
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html?role=donor">Register as Donor</a></li>
+            <li><a href="register.html?role=receiver">Register as Receiver</a></li>
+            <li><a href="requests.html">Track Requests</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-column">
+          <h4>Submission Details</h4>
+          <ul class="footer-links">
+            <li><a href="#">B.Tech Major Project</a></li>
+            <li><a href="#">Tech: HTML, CSS, JS</a></li>
+            <li><a href="#">Backend: Firebase & Firestore</a></li>
+            <li><a href="#">Project ID: sharebite-ai</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 ShareBite. All rights reserved.</div>
+        <div>Engineered for College Project Submission & Community Impact.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { initNavbarAuth } from "./js/auth.js";
+    import { getPlatformImpactData } from "./js/analytics.js";
+
+    // Initialize navbar
+    initNavbarAuth();
+
+    // Mobile nav toggle
+    const navToggle = document.getElementById("navToggle");
+    const navMenu = document.getElementById("navMenu");
+    navToggle?.addEventListener("click", () => {
+      navMenu?.classList.toggle("active");
+    });
+
+    // Populate live impact counters
+    async function loadImpactCounters() {
+      const data = await getPlatformImpactData();
+
+      const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      };
+
+      setVal("home-kpi-listings", data.totalListings);
+      setVal("home-kpi-listings-2", data.totalListings);
+      setVal("home-kpi-completed", data.completedDonations);
+      setVal("home-kpi-completed-2", data.completedDonations);
+      setVal("home-kpi-quantity", data.totalQuantityShared);
+      setVal("home-kpi-users", data.totalUsers);
+      setVal("home-kpi-users-2", data.totalUsers);
+    }
+
+    loadImpactCounters();
+  </script>
+</body>
+
+</html>

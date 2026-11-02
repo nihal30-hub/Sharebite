@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Requests – ShareBite</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <div class="dashboard-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="dashboard-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="index.html" class="logo">
+          <i class="fa-solid fa-seedling"></i>
+          Share<span>Bite</span>
+        </a>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar">U</div>
+        <div class="user-info">
+          <div class="user-name display-user-name">Loading...</div>
+          <span class="display-user-role user-role-badge role-badge-donor">Member</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" id="sidebar-nav-links">
+        <!-- Dynamically rendered based on role -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="logoutBtn" class="btn-logout">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+      <header class="dashboard-topbar">
+        <div style="display:flex; align-items:center; gap:1rem;">
+          <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="topbar-title">
+            <h1 id="page-title">Manage Food Requests</h1>
+            <p id="page-subtitle">Track pickup confirmations, handle requests, and verify food handoffs</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions" id="topbar-actions-container">
+          <button id="refreshRequestsBtn" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-rotate"></i> Refresh
+          </button>
+        </div>
+      </header>
+
+      <div class="dashboard-content">
+        <!-- Status Filter Tabs -->
+        <div class="card-box">
+          <div class="nav-tabs" id="requestFilterTabs">
+            <button class="tab-btn active" data-status="all">
+              All Requests <span class="tab-pill" id="tab-count-all">0</span>
+            </button>
+            <button class="tab-btn" data-status="pending">
+              Pending <span class="tab-pill" id="tab-count-pending">0</span>
+            </button>
+            <button class="tab-btn" data-status="accepted">
+              Accepted (Ready for Pickup) <span class="tab-pill" id="tab-count-accepted">0</span>
+            </button>
+            <button class="tab-btn" data-status="collected">
+              Collected <span class="tab-pill" id="tab-count-collected">0</span>
+            </button>
+            <button class="tab-btn" data-status="rejected">
+              Rejected / Cancelled <span class="tab-pill" id="tab-count-rejected">0</span>
+            </button>
+          </div>
+
+          <!-- Requests Table -->
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Food Item</th>
+                  <th id="th-counterparty">Party</th>
+                  <th>Quantity</th>
+                  <th>Pickup Location & Deadline</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="requests-table-body">
+                <tr>
+                  <td colspan="6" class="empty-state" style="padding: 2.5rem 1rem;">
+                    <span class="spinner spinner-dark"></span> Loading requests...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { requireAuth, logoutUser } from "./js/auth.js";
+    import { 
+      getRequestsForDonor, 
+      getRequestsForReceiver, 
+      acceptFoodRequest, 
+      rejectFoodRequest, 
+      markDonationCollected, 
+      cancelFoodRequest 
+    } from "./js/requests.js";
+    import { formatDeadline } from "./js/food.js";
+
+    // Allow both donors and receivers to view their respective requests
+    const { user, userData } = await requireAuth(["donor", "receiver"]);
+    const isDonor = userData.role === 'donor';
+
+    // Setup sidebar navigation links based on role
+    const sidebarNav = document.getElementById("sidebar-nav-links");
+    if (isDonor) {
+      sidebarNav.innerHTML = `
+        <a href="donor-dashboard.html" class="sidebar-link">
+          <i class="fa-solid fa-gauge"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="add-food.html" class="sidebar-link">
+          <i class="fa-solid fa-circle-plus"></i>
+          <span>Add Food</span>
+        </a>
+        <a href="requests.html" class="sidebar-link active">
+          <i class="fa-solid fa-bell"></i>
+          <span>Food Requests</span>
+        </a>
+        <a href="impact.html" class="sidebar-link">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Platform Impact</span>
+        </a>
+        <a href="index.html" class="sidebar-link">
+          <i class="fa-solid fa-house"></i>
+          <span>Home Page</span>
+        </a>
+      `;
+      document.getElementById("th-counterparty").textContent = "Requested By (Receiver)";
+      document.getElementById("page-title").textContent = "Donor Request Center";
+      document.getElementById("page-subtitle").textContent = "Accept or reject requests from receivers, and mark collected handoffs";
+    } else {
+      sidebarNav.innerHTML = `
+        <a href="receiver-dashboard.html" class="sidebar-link">
+          <i class="fa-solid fa-bowl-food"></i>
+          <span>Browse Food</span>
+        </a>
+        <a href="requests.html" class="sidebar-link active">
+          <i class="fa-solid fa-clipboard-list"></i>
+          <span>My Requests</span>
+        </a>
+        <a href="impact.html" class="sidebar-link">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Platform Impact</span>
+        </a>
+        <a href="index.html" class="sidebar-link">
+          <i class="fa-solid fa-house"></i>
+          <span>Home Page</span>
+        </a>
+      `;
+      document.getElementById("th-counterparty").textContent = "Donor Info";
+      document.getElementById("page-title").textContent = "My Food Requests";
+      document.getElementById("page-subtitle").textContent = "Track the status of your requests and coordinate pickup";
+    }
+
+    let allRequests = [];
+    let currentFilter = 'all';
+
+    async function loadRequests() {
+      const container = document.getElementById("requests-table-body");
+      container.innerHTML = `
+        <tr>
+          <td colspan="6" class="empty-state" style="padding: 2.5rem 1rem;">
+            <span class="spinner spinner-dark"></span> Loading requests...
+          </td>
+        </tr>
+      `;
+
+      if (isDonor) {
+        allRequests = await getRequestsForDonor(user.uid);
+      } else {
+        allRequests = await getRequestsForReceiver(user.uid);
+      }
+
+      updateTabCounts();
+      renderRequestsTable();
+    }
+
+    function updateTabCounts() {
+      const counts = {
+        all: allRequests.length,
+        pending: allRequests.filter(r => r.requestStatus === 'pending').length,
+        accepted: allRequests.filter(r => r.requestStatus === 'accepted').length,
+        collected: allRequests.filter(r => r.requestStatus === 'collected').length,
+        rejected: allRequests.filter(r => r.requestStatus === 'rejected' || r.requestStatus === 'cancelled').length
+      };
+
+      document.getElementById("tab-count-all").textContent = counts.all;
+      document.getElementById("tab-count-pending").textContent = counts.pending;
+      document.getElementById("tab-count-accepted").textContent = counts.accepted;
+      document.getElementById("tab-count-collected").textContent = counts.collected;
+      document.getElementById("tab-count-rejected").textContent = counts.rejected;
+    }
+
+    function renderRequestsTable() {
+      const container = document.getElementById("requests-table-body");
+      if (!container) return;
+
+      let filtered = allRequests;
+      if (currentFilter === 'pending') {
+        filtered = allRequests.filter(r => r.requestStatus === 'pending');
+      } else if (currentFilter === 'accepted') {
+        filtered = allRequests.filter(r => r.requestStatus === 'accepted');
+      } else if (currentFilter === 'collected') {
+        filtered = allRequests.filter(r => r.requestStatus === 'collected');
+      } else if (currentFilter === 'rejected') {
+        filtered = allRequests.filter(r => r.requestStatus === 'rejected' || r.requestStatus === 'cancelled');
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty-state" style="padding: 3rem 1.5rem;">
+              <div class="empty-icon"><i class="fa-solid fa-list-check"></i></div>
+              <h4>No Requests in this Tab</h4>
+              <p>There are no ${currentFilter === 'all' ? '' : currentFilter} requests to display at the moment.</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(req => {
+        const counterpartyDisplay = isDonor
+          ? `<div>
+               <strong>${escapeHtml(req.receiverName || 'Receiver')}</strong>
+               <div style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(req.receiverEmail || '')}</div>
+             </div>`
+          : `<div>
+               <span style="font-weight:600; color:var(--primary-forest);">Donor Listing</span>
+             </div>`;
+
+        let statusBadge = '';
+        if (req.requestStatus === 'pending') {
+          statusBadge = `<span class="badge-status pending"><i class="fa-solid fa-clock"></i> Pending</span>`;
+        } else if (req.requestStatus === 'accepted') {
+          statusBadge = `<span class="badge-status accepted"><i class="fa-solid fa-circle-check"></i> Accepted</span>`;
+        } else if (req.requestStatus === 'collected') {
+          statusBadge = `<span class="badge-status collected"><i class="fa-solid fa-handshake"></i> Collected</span>`;
+        } else if (req.requestStatus === 'rejected') {
+          statusBadge = `<span class="badge-status rejected"><i class="fa-solid fa-xmark"></i> Rejected</span>`;
+        } else if (req.requestStatus === 'cancelled') {
+          statusBadge = `<span class="badge-status rejected"><i class="fa-solid fa-ban"></i> Cancelled</span>`;
+        }
+
+        let actionButtons = '';
+        if (isDonor) {
+          if (req.requestStatus === 'pending') {
+            actionButtons = `
+              <div style="display:flex; gap:0.4rem;">
+                <button class="btn btn-success btn-sm btn-accept" data-id="${req.id}">
+                  <i class="fa-solid fa-check"></i> Accept
+                </button>
+                <button class="btn btn-outline btn-sm btn-reject" data-id="${req.id}" style="color:#dc2626; border-color:#dc2626;">
+                  <i class="fa-solid fa-xmark"></i> Reject
+                </button>
+              </div>
+            `;
+          } else if (req.requestStatus === 'accepted') {
+            actionButtons = `
+              <button class="btn btn-primary btn-sm btn-collect" data-id="${req.id}">
+                <i class="fa-solid fa-box-archive"></i> Mark as Collected
+              </button>
+            `;
+          } else {
+            actionButtons = `<span style="font-size:0.85rem; color:var(--text-muted);">Completed</span>`;
+          }
+        } else {
+          // Receiver Actions
+          if (req.requestStatus === 'pending') {
+            actionButtons = `
+              <button class="btn btn-outline btn-sm btn-cancel" data-id="${req.id}" style="color:#dc2626; border-color:#dc2626;">
+                <i class="fa-solid fa-ban"></i> Cancel
+              </button>
+            `;
+          } else if (req.requestStatus === 'accepted') {
+            actionButtons = `
+              <span class="user-role-badge role-badge-donor" style="font-size:0.75rem;">
+                <i class="fa-solid fa-map-pin"></i> Ready for Pickup
+              </span>
+            `;
+          } else {
+            actionButtons = `<span style="font-size:0.85rem; color:var(--text-muted);">-</span>`;
+          }
+        }
+
+        const deadlineFmt = formatDeadline(req.safePickupDeadline);
+
+        return `
+          <tr data-id="${req.id}">
+            <td>
+              <div style="font-weight:700; color:var(--primary-deep); font-size:0.95rem;">${escapeHtml(req.foodName)}</div>
+              ${req.note ? `<small style="color:var(--text-muted); display:block; margin-top:2px;">Note: "${escapeHtml(req.note)}"</small>` : ''}
+            </td>
+            <td>
+              ${counterpartyDisplay}
+            </td>
+            <td>
+              <strong>${req.requestedQuantity}</strong> <span style="font-size:0.85rem; color:var(--text-muted);">${escapeHtml(req.unit)}</span>
+            </td>
+            <td>
+              <div style="font-size:0.85rem;"><i class="fa-solid fa-location-dot" style="color:var(--primary-green);"></i> ${escapeHtml(req.pickupLocation)}</div>
+              <div style="font-size:0.82rem; margin-top:3px;">${deadlineFmt}</div>
+            </td>
+            <td>
+              ${statusBadge}
+            </td>
+            <td>
+              ${actionButtons}
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      attachActionHandlers();
+    }
+
+    function attachActionHandlers() {
+      const container = document.getElementById("requests-table-body");
+
+      // Accept
+      container.querySelectorAll('.btn-accept').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-id');
+          btn.disabled = true;
+          btn.innerHTML = `<span class="spinner"></span>`;
+          const res = await acceptFoodRequest(id);
+          if (res.success) {
+            await loadRequests();
+          } else {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-check"></i> Accept`;
+          }
+        });
+      });
+
+      // Reject
+      container.querySelectorAll('.btn-reject').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-id');
+          const reason = prompt("Enter optional reason for rejecting this request:") || "";
+          btn.disabled = true;
+          btn.innerHTML = `<span class="spinner"></span>`;
+          const res = await rejectFoodRequest(id, reason);
+          if (res.success) {
+            await loadRequests();
+          } else {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-xmark"></i> Reject`;
+          }
+        });
+      });
+
+      // Mark as Collected
+      container.querySelectorAll('.btn-collect').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-id');
+          if (confirm("Confirm that this food portion was handed over and collected?")) {
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner"></span>`;
+            const res = await markDonationCollected(id);
+            if (res.success) {
+              await loadRequests();
+            } else {
+              btn.disabled = false;
+              btn.innerHTML = `<i class="fa-solid fa-box-archive"></i> Mark as Collected`;
+            }
+          }
+        });
+      });
+
+      // Cancel (by Receiver)
+      container.querySelectorAll('.btn-cancel').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-id');
+          if (confirm("Are you sure you want to cancel this pending food request?")) {
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner"></span>`;
+            const res = await cancelFoodRequest(id);
+            if (res.success) {
+              await loadRequests();
+            } else {
+              btn.disabled = false;
+              btn.innerHTML = `<i class="fa-solid fa-ban"></i> Cancel`;
+            }
+          }
+        });
+      });
+    }
+
+    // Filter tab clicks
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.getAttribute("data-status");
+        renderRequestsTable();
+      });
+    });
+
+    // Refresh button
+    document.getElementById("refreshRequestsBtn")?.addEventListener("click", loadRequests);
+
+    // Initial load
+    await loadRequests();
+
+    // Logout listener
+    document.getElementById("logoutBtn")?.addEventListener("click", logoutUser);
+
+    // Mobile sidebar toggle
+    const menuBtn = document.getElementById("mobileMenuBtn");
+    const sidebar = document.getElementById("sidebar");
+    menuBtn?.addEventListener("click", () => {
+      sidebar?.classList.toggle("open");
+    });
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>

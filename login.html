@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login – ShareBite</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Navbar Minimal -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">
+        <i class="fa-solid fa-seedling"></i>
+        Share<span>Bite</span>
+      </a>
+      <div class="nav-actions">
+        <span style="font-size:0.9rem; color:var(--text-muted);">Don't have an account?</span>
+        <a href="register.html" class="btn btn-outline btn-sm">Create Account</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Login Form Container -->
+  <main class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo-icon">
+          <i class="fa-solid fa-right-to-bracket"></i>
+        </div>
+        <h2>Welcome Back</h2>
+        <p>Sign in to your ShareBite account to continue</p>
+      </div>
+
+      <div id="authAlert" style="display:none;" class="alert alert-danger"></div>
+
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="loginEmail" class="form-label">Email Address <span class="required">*</span></label>
+          <div class="input-group">
+            <i class="fa-solid fa-envelope input-icon"></i>
+            <input 
+              type="email" 
+              id="loginEmail" 
+              class="form-control" 
+              placeholder="you@example.com" 
+              required 
+              autocomplete="email"
+            >
+          </div>
+          <div id="emailError" class="form-error" style="display:none;"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword" class="form-label">Password <span class="required">*</span></label>
+          <div class="input-group">
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input 
+              type="password" 
+              id="loginPassword" 
+              class="form-control" 
+              placeholder="••••••••" 
+              required 
+              autocomplete="current-password"
+            >
+          </div>
+          <div id="passwordError" class="form-error" style="display:none;"></div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; font-size:0.85rem;">
+          <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;">
+            <input type="checkbox" id="rememberMe" style="accent-color:var(--primary-forest);"> Remember my email
+          </label>
+          <a href="#" id="forgotPasswordLink" style="color:var(--primary-green); font-weight:600;">Forgot password?</a>
+        </div>
+
+        <button type="submit" id="loginSubmitBtn" class="btn btn-primary btn-block btn-lg">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In
+        </button>
+      </form>
+
+      <div style="margin-top:1.8rem; padding-top:1.5rem; border-top:1px solid var(--cream-border); text-align:center;">
+        <p style="font-size:0.9rem; color:var(--text-muted);">
+          New to ShareBite? <a href="register.html" style="font-weight:700; color:var(--primary-forest);">Register here</a>
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Login Logic Script -->
+  <script type="module">
+    import { loginUser, showToast } from "./js/auth.js";
+    import { auth, onAuthStateChanged, doc, getDoc, db } from "./js/firebase-config.js";
+
+    const form = document.getElementById("loginForm");
+    const emailInput = document.getElementById("loginEmail");
+    const passwordInput = document.getElementById("loginPassword");
+    const submitBtn = document.getElementById("loginSubmitBtn");
+    const alertBox = document.getElementById("authAlert");
+    const rememberMe = document.getElementById("rememberMe");
+
+    // Load remembered email if available
+    const savedEmail = localStorage.getItem("sharebite_saved_email");
+    if (savedEmail) {
+      emailInput.value = savedEmail;
+      rememberMe.checked = true;
+    }
+
+    // Check if already authenticated
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const userSnap = await getDoc(doc(db, "users", user.uid));
+          if (userSnap.exists()) {
+            const role = userSnap.data().role;
+            if (role === 'donor') {
+              window.location.href = "donor-dashboard.html";
+            } else {
+              window.location.href = "receiver-dashboard.html";
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    });
+
+    // Form submission
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      alertBox.style.display = "none";
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      // Simple validation
+      if (!email) {
+        showFieldError("emailError", "Please enter your email address.");
+        emailInput.focus();
+        return;
+      }
+      if (!password) {
+        showFieldError("passwordError", "Please enter your password.");
+        passwordInput.focus();
+        return;
+      }
+
+      // Remember me logic
+      if (rememberMe.checked) {
+        localStorage.setItem("sharebite_saved_email", email);
+      } else {
+        localStorage.removeItem("sharebite_saved_email");
+      }
+
+      // Show spinner
+      const origText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span class="spinner"></span> Signing in...`;
+
+      const result = await loginUser(email, password);
+
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = origText;
+
+      if (result.success) {
+        if (result.role === 'donor') {
+          window.location.href = "donor-dashboard.html";
+        } else {
+          window.location.href = "receiver-dashboard.html";
+        }
+      } else {
+        alertBox.textContent = result.error;
+        alertBox.style.display = "flex";
+      }
+    });
+
+    function showFieldError(elId, msg) {
+      const el = document.getElementById(elId);
+      if (el) {
+        el.textContent = msg;
+        el.style.display = "block";
+      }
+    }
+
+    // Forgot password alert
+    document.getElementById("forgotPasswordLink")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      alert("Please contact the platform administrator or register a new account to test.");
+    });
+  </script>
+</body>
+</html>

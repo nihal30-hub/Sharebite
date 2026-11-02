@@ -1,0 +1,69 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==========================================
+    // 1. Users Collection
+    // ==========================================
+    match /users/{userId} {
+      // Authenticated users can read member profiles
+      allow read: if request.auth != null;
+      
+      // User can create their own profile document on registration
+      allow create: if request.auth != null 
+                    && request.auth.uid == userId
+                    && request.resource.data.role in ['donor', 'receiver'];
+      
+      // Users can update their name/profile, but CANNOT alter their assigned role or UID
+      allow update: if request.auth != null 
+                    && request.auth.uid == userId 
+                    && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'uid']));
+      
+      // User deletion disallowed from client
+      allow delete: if false;
+    }
+
+    // ==========================================
+    // 2. Food Listings Collection
+    // ==========================================
+    match /foodListings/{listingId} {
+      // Anyone can read available food listings to browse surplus food
+      allow read: if true;
+      
+      // Only authenticated users (Donors) can create food listings under their UID
+      allow create: if request.auth != null 
+                    && request.resource.data.donorId == request.auth.uid
+                    && request.resource.data.quantity >= 0;
+      
+      // Only the listing's donor can modify the food details, or deduct quantity upon request
+      allow update: if request.auth != null 
+                    && (resource.data.donorId == request.auth.uid || request.resource.data.donorId == resource.data.donorId);
+      
+      // Only the creator donor can delete their food listing
+      allow delete: if request.auth != null 
+                    && resource.data.donorId == request.auth.uid;
+    }
+
+    // ==========================================
+    // 3. Food Requests Collection
+    // ==========================================
+    match /foodRequests/{requestId} {
+      // Authenticated users can read requests (for user dashboard and impact calculations)
+      allow read: if request.auth != null;
+      
+      // Receivers can submit requests for themselves with valid positive quantity
+      allow create: if request.auth != null 
+                    && request.resource.data.receiverId == request.auth.uid
+                    && request.resource.data.requestedQuantity > 0;
+      
+      // Donors can accept/reject/mark collected for their listings; receivers can cancel their pending requests
+      allow update: if request.auth != null 
+                    && (resource.data.donorId == request.auth.uid 
+                        || (resource.data.receiverId == request.auth.uid && resource.data.requestStatus == 'pending'));
+      
+      // Donors or receivers can delete their finished/cancelled requests
+      allow delete: if request.auth != null 
+                    && (resource.data.donorId == request.auth.uid || resource.data.receiverId == request.auth.uid);
+    }
+  }
+}
